@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from taxsim.driver import Driver
 
 if __name__ == '__main__':
