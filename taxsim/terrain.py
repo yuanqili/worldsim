@@ -1,9 +1,13 @@
 import abc
+import os
 import random
 
+from dotenv import load_dotenv, dotenv_values
 from termcolor import colored
 
-from taxsim.item import Food
+from taxsim.item import Food, Gold
+
+load_dotenv()
 
 
 class Terrain(abc.ABC):
@@ -49,26 +53,24 @@ class Water(Terrain):
 
 class Fertile(Terrain):
     terrain_name = 'Fertile'
-    TERRAIN_FERTILE_DEFAULT_PROB = 0.1
-    TERRAIN_FERTILE_DEFAULT_CYCLE = 20
 
     def __init__(self, cell):
         super().__init__(cell)
-        self.prob = Fertile.TERRAIN_FERTILE_DEFAULT_PROB
-        self.cycle = Fertile.TERRAIN_FERTILE_DEFAULT_CYCLE
+        self.prob = float(os.environ.get('TERRAIN_FERTILE_FOOD_DEFAULT_PROB', 0.1))
+        self.cycle = int(os.environ.get('TERRAIN_FERTILE_FOOD_DEFAULT_CYCLE', 10))
 
     def tick(self):
         self.cycle -= 1
         if self.cycle > 0:
             return
-
         if random.random() < self.prob:
+            # TODO: may need to check if the cell is full
             self.cell.add_item(Food())
-            self.prob = Fertile.TERRAIN_FERTILE_DEFAULT_PROB
+            self.prob = float(os.environ.get('TERRAIN_FERTILE_FOOD_DEFAULT_PROB', 0.1))
         else:
             if self.prob <= 0.3:
                 self.prob += 0.02
-        self.cycle = Fertile.TERRAIN_FERTILE_DEFAULT_CYCLE
+        self.cycle = int(os.environ.get('TERRAIN_FERTILE_FOOD_DEFAULT_CYCLE', 10))
 
     def __repr__(self):
         return colored('*', 'yellow')
@@ -79,9 +81,21 @@ class Mountain(Terrain):
 
     def __init__(self, cell):
         super().__init__(cell)
+        self.prob = float(os.environ.get('TERRAIN_MOUNTAIN_GOLD_DEFAULT_PROB', 0.1))
+        self.cycle = int(os.environ.get('TERRAIN_MOUNTAIN_GOLD_DEFAULT_CYCLE', 10))
 
     def tick(self):
-        return
+        self.cycle -= 1
+        if self.cycle > 0:
+            return
+        if random.random() < self.prob:
+            # TODO: may need to check if the cell is full
+            self.cell.add_item(Gold())
+            self.prob = float(os.environ.get('TERRAIN_MOUNTAIN_GOLD_DEFAULT_PROB', 0.1))
+        else:
+            if self.prob <= 0.3:
+                self.prob += 0.02
+        self.cycle = int(os.environ.get('TERRAIN_MOUNTAIN_GOLD_DEFAULT_CYCLE', 10))
 
     def __repr__(self):
         return colored('%', 'magenta')
