@@ -14,11 +14,11 @@ class Driver:
         while True:
             round += 1
             print(f'AI Economist – Round: {round}')
-            print(f'Author: Jingwei Huang')
             self.world.draw()
             self.world.tick()
             time.sleep(tick_time)
             self.clear()
 
-    def clear(self):
+    @staticmethod
+    def clear():
         os.system('clear')
